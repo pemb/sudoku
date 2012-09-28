@@ -1,7 +1,9 @@
+#ifndef STRATEGIES_H
+#define STRATEGIES_H
 
-int singles(int ***);
+#include "typedefs.h"
 
-int (* strategies[])(int ***) = {singles};
+int singles(matrix);
 
-int functions = sizeof(strategies)/sizeof(void *);
-
+int onlypossible(matrix);
+#endif

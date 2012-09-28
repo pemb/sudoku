@@ -1,13 +1,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "sudoku.h"
 #include "strategies.h"
+#include "sudoku.h"
 
+int (* strategies[])(matrix) = {singles, onlypossible};
+
+int functions = 2;
 
 int solveSudoku (int grid[9][9] )
 {
-  int *** pMatrix = newPMatrix(NULL), i, j, k, retVal;
+  matrix pMatrix = newPMatrix(NULL);
+  cell i, j, k;
+  int retVal;
   for (i = 0; i < 9; i++)
     {
       for (j = 0; j < 9; j++)
@@ -28,8 +33,9 @@ int solveSudoku (int grid[9][9] )
 	{
 	  for (j = 0; j < 9; j++)
 	    {
-	      k = 1;	     
-	      while (!grid[i][j])
+	      k = 1;
+	      if(pMatrix[i][j][0]%10 )
+		while (!grid[i][j])
 		{
 		  grid[i][j] = k * pMatrix[i][j][k];
 		  k++;
@@ -41,9 +47,9 @@ int solveSudoku (int grid[9][9] )
   return retVal;
 }
 
-int sudokuWorker(int *** pMatrix)
+int sudokuWorker(matrix pMatrix)
 {
-  int * temp, k = 0, i, j, l;  
+  cell * temp, k = 0, i, j, l;
   while (k < functions)
     {
       if (strategies[k](pMatrix))
@@ -56,16 +62,18 @@ int sudokuWorker(int *** pMatrix)
     case -1:
       return 0;
     case 1:
+    case 11:
       return 1;      
     case 0:
       break;
     }
+  /* return 1; */
   i = getLowest(pMatrix);
   j = i%10;
   i /= 10;
   k = 1;
-  temp = malloc(9*9*10*sizeof(int));
-  memcpy(temp, **pMatrix, 9*9*10*sizeof(int));
+  temp = malloc(9*9*10*sizeof(cell));
+  memcpy(temp, **pMatrix, 9*9*10*sizeof(cell));
   for (k = 1; k < 10; k++)
     {
       if (!pMatrix[i][j][k])
@@ -78,15 +86,16 @@ int sudokuWorker(int *** pMatrix)
 	  k = 11;	  
 	  break;
 	}
-      memcpy(**pMatrix, temp, 9*9*10*sizeof(int));
+      memcpy(**pMatrix, temp, 9*9*10*sizeof(cell));
     }
   free(temp);
   return k == 11; 
 }
 
-int checkState(int *** pMatrix)
+int checkState(matrix pMatrix)
 {
-  int i, j, flag = 1;
+  cell i, j;
+  int flag = 1;
   for (i = 0; i < 9; i++)
     {
       for (j = 0; j < 9; j++)
@@ -96,6 +105,7 @@ int checkState(int *** pMatrix)
 	    case 0:
 	      return -1;
 	    case 1:
+	    /* case 11: */
 	      break;
 	    default:
 	      flag = 0;
@@ -105,9 +115,10 @@ int checkState(int *** pMatrix)
   return flag;  
 }
 
-int getLowest(int *** pMatrix)
+int getLowest(matrix pMatrix)
 {
-  int i, j, count = 9, retVal = 0;
+  cell i, j, count = 9;
+  int retVal = 0;
   for (i = 0; i < 9; i++)
     {
       for (j = 0; j < 9; j++)
@@ -122,13 +133,14 @@ int getLowest(int *** pMatrix)
   return retVal;
 }
 
-int *** newPMatrix(int *** original)
+matrix newPMatrix(matrix original)
 {
-  int *** pMatrix =  malloc (9*sizeof (int**)), i, j;
-  *pMatrix = malloc (9*9*sizeof(int*));
-  **pMatrix = calloc (9*9*10,sizeof(int));
+  matrix pMatrix = malloc (9*sizeof (cell**));
+  cell i, j;
+  *pMatrix = malloc (9*9*sizeof(cell*));
+  **pMatrix = calloc (9*9*10,sizeof(cell));
   if (original != NULL)
-    memcpy( **pMatrix, **original, 9*9*10*sizeof(int));
+    memcpy( **pMatrix, **original, 9*9*10*sizeof(cell));
   for (i = 0; i < 9; i++)
     {
       if (i)
@@ -144,7 +156,7 @@ int *** newPMatrix(int *** original)
   return pMatrix;  
 }
 
-void freePMatrix(int *** pMatrix)
+void freePMatrix(matrix pMatrix)
 {
   free(**pMatrix);
   free(*pMatrix);
