@@ -1,10 +1,26 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "strategies.h"
-#include "sudoku.h"
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
 
-int (* strategies[])(matrix) = {singles, onlypossible};
+typedef int cell;
+
+typedef cell *** matrix;
+
+int singles(matrix);
+
+int solveSudoku(int [9][9]);
+
+matrix newPMatrix(matrix);
+
+int sudokuWorker(matrix);
+
+void freePMatrix(matrix);
+
+int checkState(matrix);
+
+int getLowest(matrix);
+
+int (* strategies[])(matrix) = {singles};
 
 int functions = 1;
 
@@ -160,5 +176,81 @@ void freePMatrix(matrix pMatrix)
   free(**pMatrix);
   free(*pMatrix);
   free(pMatrix);
+}
+
+int singles(matrix pMatrix)
+{
+  cell i, j, k, digit = 0, count = 0;
+  for (i = 0; i < 9; i++)
+    {
+      for (j = 0; j < 9; j++)
+	{
+	  /* tests square for single prob */
+	  if (pMatrix[i][j][0] == 1)
+	    {
+	      pMatrix[i][j][0] = 11; 
+	      for (digit = 1; digit < 10; digit++)
+		{
+		  if (pMatrix[i][j][digit])
+		    break;
+		}
+	      if (digit == 10)
+		continue;
+	      for (k = 0; k < 9; k++)
+		{
+		  if (pMatrix[i][k][digit] && k != j)
+		    {
+		      pMatrix[i][k][digit] = 0;
+		      pMatrix[i][k][0]--;
+		      count++;		      
+		    }
+		  if (pMatrix[k][j][digit] && k != i)
+		    {
+		      pMatrix[k][j][digit] = 0;
+		      pMatrix[k][j][0]--;
+		      count++;		      
+		    }
+		  if (pMatrix[i/3*3+k/3][j/3*3+k%3][digit] && (i/3*3+k/3 != i || j/3*3+k%3 != j))
+		    {
+		      pMatrix[i/3*3+k/3][j/3*3+k%3][digit] = 0;
+		      pMatrix[i/3*3+k/3][j/3*3+k%3][0]--;
+		      count++;		      
+		    }
+		}
+	    }
+	  /* ends testing loop */
+	}
+    }
+  return count;
+}
+
+
+/*Funcao que imprime a matriz 9x9 que armazena o jogo de Sudoku (opcionalmente a matriz pode ser global e nao passada por parametro)*/
+void imprime(int mat[9][9]){
+  int i, j;
+  for(i=0; i<9; i++)
+    {
+      for(j=0; j<9; j++)
+	  printf("%d", mat[i][j]);
+      putchar('\n');
+    }
+  return;
+}
+
+int main()
+{
+  int mat[9][9], x, y, v, casos;
+  for (scanf ("%d", &casos); casos > 0; casos--)
+    {
+      for (x = 0; x < 9; x++)
+	for (y = 0; y < 9; y++)
+	  {
+	    scanf(" %1d",&v);
+	    mat[x][y] = v;
+	  }
+      solveSudoku(mat);
+      imprime(mat);
+    }
+  return 0;
 }
 

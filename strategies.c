@@ -12,7 +12,7 @@ int singles(matrix pMatrix)
 	  /* tests square for single prob */
 	  if (pMatrix[i][j][0] == 1)
 	    {
-	      /* pMatrix[i][j][0] = 11; */
+	      pMatrix[i][j][0] = 11; 
 	      for (digit = 1; digit < 10; digit++)
 		{
 		  if (pMatrix[i][j][digit])
@@ -51,7 +51,7 @@ int singles(matrix pMatrix)
 int onlypossible(matrix pMatrix)
 {
   cell i, j, k, l, map[3][10], count = 0;
-  return 0;  
+  /* return 0;   */
   for (i = 0; i < 9; i++)
     {
       memset(map, 0, sizeof(cell)*30);
@@ -100,6 +100,7 @@ int onlypossible(matrix pMatrix)
 		{
 		  if (pMatrix[i/3*3+j/3][i%3*3+j%3][0] > 1 && pMatrix[i/3*3+j/3][i%3*3+j%3][0] < 10 && pMatrix[i/3*3+j/3][i%3*3+j%3][k])
 		    {
+		      
 		      count++;
 		      pMatrix[i/3*3+j/3][i%3*3+j%3][0] = 1;
 		      for (l = 1; l < 10; l++)
@@ -110,10 +111,7 @@ int onlypossible(matrix pMatrix)
 	    }
 	}
     }
-  /* if (count) */
-  /*   { */
-  /*     printf( "%d ", count); */
-  /*     putchar('\n'); */
-  /*   } */
+   /* if (count)  */
+   /*   printf("AEAE\n"); */
   return count;
 }
